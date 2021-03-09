@@ -49,10 +49,19 @@ const generateBarCode = (url, canvas) => {
   });
 };
 
+const clearCanvas = (canvas) => {
+  canvas.getObjects().forEach((obj) => {
+    if (obj !== canvas.backgroundImage) {
+      canvas.remove(obj);
+    }
+  });
+};
+
 const CANVAS_ID = "canvas";
 const INPUT_BACKGROUND_ID = "background-upload";
 const QR_CODE_BTN_ID = "qr-code-btn";
 const BAR_CODE_BTN_ID = "bar-code-btn";
+const RESET_BTN_ID = "reset-btn";
 
 const QR_CODE_URL = "./public/imgs/qr-code.png";
 const BAR_CODE_URL = "./public/imgs/bar-code.png";
@@ -60,6 +69,7 @@ const BAR_CODE_URL = "./public/imgs/bar-code.png";
 const inputFile = document.getElementById(INPUT_BACKGROUND_ID);
 const qrCodeButton = document.getElementById(QR_CODE_BTN_ID);
 const barCodeButton = document.getElementById(BAR_CODE_BTN_ID);
+const resetButton = document.getElementById(RESET_BTN_ID);
 
 const reader = new FileReader();
 const canvas = initCanvas(CANVAS_ID);
@@ -88,3 +98,7 @@ qrCodeButton.addEventListener("click", () =>
 barCodeButton.addEventListener("click", () =>
   generateBarCode(BAR_CODE_URL, canvas)
 );
+
+resetButton.addEventListener("click", () => {
+  clearCanvas(canvas);
+});
