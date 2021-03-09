@@ -1,0 +1,23 @@
+{
+  "name": "custom-deal-poster",
+  "version": "1.0.0",
+  "description": "Using for custom QR code or Bar code for deal poster",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trgianghuynh1808/custom-deal-poster.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trgianghuynh1808/custom-deal-poster/issues"
+  },
+  "homepage": "https://github.com/trgianghuynh1808/custom-deal-poster#readme",
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
