@@ -34,6 +34,8 @@ const generateQRCode = (url, canvas) => {
     const QR_CODE_IMG_SCALE = 0.1;
 
     formatImgObject(img, canvas, QR_CODE_IMG_SCALE);
+    img.cacheKey = QR_CODE_CACHE_KEY;
+
     canvas.add(img);
     canvas.renderAll();
   });
@@ -44,6 +46,8 @@ const generateBarCode = (url, canvas) => {
     const BAR_CODE_IMG_SCALE = 0.5;
 
     formatImgObject(img, canvas, BAR_CODE_IMG_SCALE);
+    img.cacheKey = BAR_CODE_CACHE_KEY;
+
     canvas.add(img);
     canvas.renderAll();
   });
@@ -51,25 +55,50 @@ const generateBarCode = (url, canvas) => {
 
 const clearCanvas = (canvas) => {
   canvas.getObjects().forEach((obj) => {
-    if (obj !== canvas.backgroundImage) {
-      canvas.remove(obj);
-    }
+    canvas.remove(obj);
+  });
+};
+
+const exportData = (canvas) => {
+  const data = canvas.getObjects().map((obj) => {
+    const { cacheKey, height, width, scaleX, scaleY, top, left, angle } = obj;
+
+    return {
+      cacheKey,
+      height: height * scaleY,
+      width: width * scaleX,
+      top,
+      left,
+      angle,
+    };
+  });
+
+  //add canvas data
+  const { height, width } = canvas;
+  const canvasData = {
+    cacheKey: BACKGROUND_CACHE_KEY,
+    height,
+    width,
+  };
+  data.push(canvasData);
+
+  console.log({
+    data,
   });
 };
 
 const CANVAS_ID = "canvas";
-const INPUT_BACKGROUND_ID = "background-upload";
-const QR_CODE_BTN_ID = "qr-code-btn";
-const BAR_CODE_BTN_ID = "bar-code-btn";
-const RESET_BTN_ID = "reset-btn";
-
+const QR_CODE_CACHE_KEY = "qr-code";
+const BAR_CODE_CACHE_KEY = "bar-code";
+const BACKGROUND_CACHE_KEY = "background";
 const QR_CODE_URL = "./public/imgs/qr-code.png";
 const BAR_CODE_URL = "./public/imgs/bar-code.png";
 
-const inputFile = document.getElementById(INPUT_BACKGROUND_ID);
-const qrCodeButton = document.getElementById(QR_CODE_BTN_ID);
-const barCodeButton = document.getElementById(BAR_CODE_BTN_ID);
-const resetButton = document.getElementById(RESET_BTN_ID);
+const inputFile = document.getElementById("background-upload");
+const qrCodeButton = document.getElementById("qr-code-btn");
+const barCodeButton = document.getElementById("bar-code-btn");
+const resetButton = document.getElementById("reset-btn");
+const exportButton = document.getElementById("export-btn");
 
 const reader = new FileReader();
 const canvas = initCanvas(CANVAS_ID);
@@ -101,4 +130,8 @@ barCodeButton.addEventListener("click", () =>
 
 resetButton.addEventListener("click", () => {
   clearCanvas(canvas);
+});
+
+exportButton.addEventListener("click", () => {
+  exportData(canvas);
 });
