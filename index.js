@@ -16,6 +16,7 @@ const setBackgroundImg = (url, canvas) => {
 
 const uploadFile = (event) => {
   const file = event.target.files[0];
+  curFile = file;
   reader.readAsDataURL(file);
 };
 
@@ -25,8 +26,6 @@ const formatImgObject = (img, canvas, scale) => {
   img.scale(scale).set("flipX", true);
   img.left = canvasCenter.left;
   img.top = canvasCenter.top;
-  img.originX = "center";
-  img.originY = "center";
 };
 
 const generateQRCode = (url, canvas) => {
@@ -59,6 +58,57 @@ const clearCanvas = (canvas) => {
   });
 };
 
+const callGenerateVoucherAPI = (qrConfigData, barConfigData) => {
+  const query = `
+  mutation($file: Upload!, $configs: GENERATE_VOUCHER_CONFIGS!){
+    generate_voucher(file: $file, configs:$configs)
+  }
+`;
+
+  const configs = {
+    giftCode: giftCodeInput.value || "GIANGKUTE",
+    qrConfig: {
+      x: qrConfigData.left,
+      y: qrConfigData.top,
+      height: qrConfigData.height,
+      width: qrConfigData.width,
+    },
+    barConfig: {
+      x: barConfigData.left,
+      y: barConfigData.top,
+    },
+  };
+
+  let formData = new FormData();
+  const operations = JSON.stringify({
+    query,
+    variables: { configs, file: null },
+  });
+  formData.append("operations", operations);
+
+  const map = {
+    0: ["variables.file"],
+  };
+  formData.append("map", JSON.stringify(map));
+  formData.append("0", curFile);
+
+  axios({
+    url: "http://localhost:4002/graphql",
+    method: "post",
+    data: formData,
+  })
+    .then((response) => {
+      const { data } = response.data;
+      const url = data.generate_voucher;
+      giftCodeInput.value = "";
+
+      console.log({ url });
+    })
+    .catch((error) => {
+      console.log({ error });
+    });
+};
+
 const exportData = (canvas) => {
   const data = canvas.getObjects().map((obj) => {
     const { cacheKey, height, width, scaleX, scaleY, top, left, angle } = obj;
@@ -82,9 +132,11 @@ const exportData = (canvas) => {
   };
   data.push(canvasData);
 
-  console.log({
-    data,
-  });
+  const qrConfigData = data.find((item) => item.cacheKey === QR_CODE_CACHE_KEY);
+  const barConfigData = data.find(
+    (item) => item.cacheKey === BAR_CODE_CACHE_KEY
+  );
+  callGenerateVoucherAPI(qrConfigData, barConfigData);
 };
 
 const CANVAS_ID = "canvas";
@@ -99,9 +151,11 @@ const qrCodeButton = document.getElementById("qr-code-btn");
 const barCodeButton = document.getElementById("bar-code-btn");
 const resetButton = document.getElementById("reset-btn");
 const exportButton = document.getElementById("export-btn");
+const giftCodeInput = document.getElementById("gift-code-input");
 
 const reader = new FileReader();
 const canvas = initCanvas(CANVAS_ID);
+let curFile = null;
 
 //Event Listeners
 inputFile.addEventListener("change", uploadFile);
@@ -130,6 +184,7 @@ barCodeButton.addEventListener("click", () =>
 
 resetButton.addEventListener("click", () => {
   clearCanvas(canvas);
+  giftCodeInput.value = "";
 });
 
 exportButton.addEventListener("click", () => {
