@@ -16,4 +16,5 @@ Project was split two repo:
 
 ## Demo Video
 
-- [https://www.youtube.com/watch?v=x8WBdrKMMr0](https://www.youtube.com/watch?v=x8WBdrKMMr0)
+- [Client Side Demo](https://www.youtube.com/watch?v=HgytIqfrwQU)
+- [Full Demo](https://www.youtube.com/watch?v=x8WBdrKMMr0)
